@@ -42,11 +42,12 @@
 <li><a href="#redoing-the-previously-undone-command-code-redo-code">4.11. Redoing the previously undone command : <code>redo</code></a></li>
 <li><a href="#listing-all-themes-code-themeslist-code">4.12. Listing all themes : <code>themeslist</code></a></li>
 <li><a href="#switching-themes-code-switch-code">4.13. Switching themes : <code>switch</code></a></li>
-<li><a href="#favouriting-a-person-code-favourite-code">4.14. Favouriting a person : <code>favourite</code></a></li>
-<li><a href="#unfavouriting-a-person-code-unfavourite-code">4.15. Unfavouriting a person : <code>unfavourite</code></a></li>
-<li><a href="#clearing-all-entries-code-clear-code">4.16. Clearing all entries : <code>clear</code></a></li>
-<li><a href="#exiting-the-program-code-exit-code">4.17. Exiting the program : <code>exit</code></a></li>
-<li><a href="#saving-the-data">4.18. Saving the data</a></li>
+<li><a href="#adding-an-event-addevent">4.14. Adding an event : 'addevent'</a></li>
+<li><a href="#favouriting-a-person-code-favourite-code">4.15. Favouriting a person : <code>favourite</code></a></li>
+<li><a href="#unfavouriting-a-person-code-unfavourite-code">4.16. Unfavouriting a person : <code>unfavourite</code></a></li>
+<li><a href="#clearing-all-entries-code-clear-code">4.17. Clearing all entries : <code>clear</code></a></li>
+<li><a href="#exiting-the-program-code-exit-code">4.18. Exiting the program : <code>exit</code></a></li>
+<li><a href="#saving-the-data">4.19. Saving the data</a></li>
 </ul>
 </li>
 <li><a href="#faq">5. FAQ</a></li>
@@ -178,7 +179,7 @@ e.g. typing <strong><code>help</code></strong> and pressing <kbd>Enter</kbd> wil
 <h3 id="adding-a-person-code-add-code"><a class="link" href="#adding-a-person-code-add-code">4.2. Adding a person: <code>add</code></a></h3>
 <div class="paragraph">
 <p>Adds a person to the address book<br>
-Format: <code>add n/NAME p/PHONE_NUMBER e/EMAIL se/SCHOOL_EMAIL w/WEBSITE a/ADDRESS b/BIRTHDAY [t/TAG]&#8230;&#8203;</code></p>
+Format: <code>add n/NAME p/PHONE_NUMBER h/HOME_NUMBER e/EMAIL se/SCHOOL_EMAIL w/WEBSITE a/ADDRESS b/BIRTHDAY [t/TAG]</code></p>
 </div>
 <div class="admonitionblock tip">
 <table>
@@ -198,10 +199,10 @@ A person can have any number of tags (including 0)
 <div class="ulist">
 <ul>
 <li>
-<p><code>add n/John Doe p/98765432 e/johnd@example.com se/john@u.nus.edu w/https://www.facebook.com/johnDoe a/John street, block 123, #01-01 b/12/11/1972</code></p>
+<p><code>add n/John Doe p/98765432 h/65812321 e/johnd@example.com se/john@u.nus.edu w/https://www.facebook.com/johnDoe a/John street, block 123, #01-01 b/12/11/1972</code></p>
 </li>
 <li>
-<p><code>add n/Betsy Crowe t/friend e/betsycrowe@example.com se/betsy@u.nus.edu w/https://www.facebook.com/betsyCrowe a/Newgate Prison p/1234567 b/02/03/2000 t/criminal</code></p>
+<p><code>add n/Betsy Crowe t/friend e/betsycrowe@example.com p/98123414 h/65132100 se/betsy@u.nus.edu w/https://www.facebook.com/betsyCrowe a/Newgate Prison p/1234567 b/02/03/2000 t/criminal</code></p>
 </li>
 </ul>
 </div>
@@ -224,7 +225,7 @@ Format: <code>sort</code></p>
 <h3 id="editing-a-person-code-edit-code"><a class="link" href="#editing-a-person-code-edit-code">4.5. Editing a person : <code>edit</code></a></h3>
 <div class="paragraph">
 <p>Edits an existing person in the address book.<br>
-Format: <code>edit INDEX [n/NAME] [p/PHONE] [e/EMAIL] [se/SCHOOL_EMAIL] [w/WEBSITE] [a/ADDRESS] [t/TAG]&#8230;&#8203;</code></p>
+Format: <code>edit INDEX [n/NAME] [p/PHONE] [h/HOME_NUMBER] [e/EMAIL] [se/SCHOOL_EMAIL] [w/WEBSITE] [a/ADDRESS] [b/BIRTHDAY] [t/TAG]&#8230;&#8203;</code></p>
 </div>
 <div class="sidebarblock">
 <div class="content">
@@ -540,7 +541,27 @@ Switches to the 2nd theme in the themes list.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="favouriting-a-person-code-favourite-code"><a class="link" href="#favouriting-a-person-code-favourite-code">4.14. Favouriting a person : <code>favourite</code></a></h3>
+<h3 id="adding-an-event-addevent"><a class="link" href="#adding-an-event-addevent">4.14. Adding an event : 'addevent'</a></h3>
+<div class="paragraph">
+<p>Adds an event to the address book<br>
+Format: <code>add n/NAME d/DATE a/ADDRESS</code></p>
+</div>
+<div class="paragraph">
+<p>Examples:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>add n/ZoukOut d/23/12/2017 a/Sentosa, Siloso Beach</code></p>
+</li>
+<li>
+<p><code>add n/Orbital d/1/5/2018 a/NUS School Of Computing</code></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="favouriting-a-person-code-favourite-code"><a class="link" href="#favouriting-a-person-code-favourite-code">4.15. Favouriting a person : <code>favourite</code></a></h3>
 <div class="paragraph">
 <p>Favourites the specified person from the address book.<br>
 Format: <code>favourite INDEX</code></p>
@@ -581,7 +602,7 @@ Favourites the 1st person in the results of the <code>find</code> command.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="unfavouriting-a-person-code-unfavourite-code"><a class="link" href="#unfavouriting-a-person-code-unfavourite-code">4.15. Unfavouriting a person : <code>unfavourite</code></a></h3>
+<h3 id="unfavouriting-a-person-code-unfavourite-code"><a class="link" href="#unfavouriting-a-person-code-unfavourite-code">4.16. Unfavouriting a person : <code>unfavourite</code></a></h3>
 <div class="paragraph">
 <p>Unfavourites the specified person from the address book.<br>
 Format: <code>unfavourite INDEX</code></p>
@@ -622,21 +643,21 @@ Unfavourites the 1st person in the results of the <code>find</code> command.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="clearing-all-entries-code-clear-code"><a class="link" href="#clearing-all-entries-code-clear-code">4.16. Clearing all entries : <code>clear</code></a></h3>
+<h3 id="clearing-all-entries-code-clear-code"><a class="link" href="#clearing-all-entries-code-clear-code">4.17. Clearing all entries : <code>clear</code></a></h3>
 <div class="paragraph">
 <p>Clears all entries from the address book.<br>
 Format: <code>clear</code></p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="exiting-the-program-code-exit-code"><a class="link" href="#exiting-the-program-code-exit-code">4.17. Exiting the program : <code>exit</code></a></h3>
+<h3 id="exiting-the-program-code-exit-code"><a class="link" href="#exiting-the-program-code-exit-code">4.18. Exiting the program : <code>exit</code></a></h3>
 <div class="paragraph">
 <p>Exits the program.<br>
 Format: <code>exit</code></p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="saving-the-data"><a class="link" href="#saving-the-data">4.18. Saving the data</a></h3>
+<h3 id="saving-the-data"><a class="link" href="#saving-the-data">4.19. Saving the data</a></h3>
 <div class="paragraph">
 <p>Address book data are saved in the hard disk automatically after any command that changes the data.<br>
 There is no need to save manually.</p>
@@ -659,8 +680,8 @@ There is no need to save manually.</p>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>Add</strong> <code>add n/NAME p/PHONE_NUMBER e/EMAIL se/SCHOOL_EMAIL w/WEBSITE a/ADDRESS b/BIRTHDAY [t/TAG]&#8230;&#8203;</code><br>
-e.g. <code>add n/James Ho p/22224444 e/jamesho@example.com se/jamesho@u.nus.edu w/https://www.facebook.com/jamesHo a/123, Clementi Rd, 1234665 t/friend t/colleague</code></p>
+<p><strong>Add</strong> <code>add n/NAME p/PHONE_NUMBER h/HOME_NUMBER e/EMAIL se/SCHOOL_EMAIL w/WEBSITE a/ADDRESS b/BIRTHDAY [t/TAG]&#8230;&#8203;</code><br>
+e.g. <code>add n/James Ho p/22224444 h/65812131 e/jamesho@example.com se/jamesho@u.nus.edu w/https://www.facebook.com/jamesHo a/123, Clementi Rd, 1234665 t/friend t/colleague</code></p>
 </li>
 <li>
 <p><strong>Clear</strong> : <code>clear</code></p>
@@ -670,7 +691,7 @@ e.g. <code>add n/James Ho p/22224444 e/jamesho@example.com se/jamesho@u.nus.edu 
 e.g. <code>delete 3</code></p>
 </li>
 <li>
-<p><strong>Edit</strong> : <code>edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [se/SCHOOL_EMAIL] [w/WEBSITE] [a/ADDRESS] [b/BIRTHDAY] [t/TAG]&#8230;&#8203;</code><br>
+<p><strong>Edit</strong> : <code>edit INDEX [n/NAME] [p/PHONE_NUMBER] [h/HOME_NUMBER] [e/EMAIL] [se/SCHOOL_EMAIL] [w/WEBSITE] [a/ADDRESS] [b/BIRTHDAY] [t/TAG]&#8230;&#8203;</code><br>
 e.g. <code>edit 2 n/James Lee e/jameslee@example.com</code></p>
 </li>
 <li>
@@ -695,6 +716,10 @@ e.g.<code>select 2</code></p>
 </li>
 <li>
 <p><strong>Redo</strong> : <code>redo</code></p>
+</li>
+<li>
+<p><strong>AddEvent</strong> <code>addevent n/NAME d/DATE a/ADDRESS</code><br>
+e.g. <code>addevent n/IHG Floorball d/16/01/2018 a/NUS Sports Recreation Centre</code></p>
 </li>
 </ul>
 </div>
@@ -725,7 +750,7 @@ suggest similar words.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-10-19 06:35:59 +00:00
+Last updated 2017-10-19 06:36:28 +00:00
 </div>
 </div>
 </body>
