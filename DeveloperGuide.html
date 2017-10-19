@@ -47,11 +47,12 @@
 <li><a href="#implementation">5. Implementation</a>
 <ul class="sectlevel2">
 <li><a href="#undo-redo-mechanism">5.1. Undo/Redo mechanism</a></li>
-<li><a href="#sort-mechanism">5.2. Sort mechanism</a></li>
-<li><a href="#access-website-mechanism">5.3. Access Website mechanism</a></li>
-<li><a href="#find-mechanism">5.4. Find Mechanism</a></li>
-<li><a href="#logging">5.5. Logging</a></li>
-<li><a href="#configuration">5.6. Configuration</a></li>
+<li><a href="#switch-theme-mechanism">5.2. Switch Theme Mechanism</a></li>
+<li><a href="#sort-mechanism">5.3. Sort mechanism</a></li>
+<li><a href="#access-website-mechanism">5.4. Access Website mechanism</a></li>
+<li><a href="#find-mechanism">5.5. Find Mechanism</a></li>
+<li><a href="#logging">5.6. Logging</a></li>
+<li><a href="#configuration">5.7. Configuration</a></li>
 </ul>
 </li>
 <li><a href="#documentation">6. Documentation</a>
@@ -806,7 +807,122 @@ If the <code>redoStack</code> is empty, then there are no other commands left to
 </div>
 </div>
 <div class="sect2">
-<h3 id="sort-mechanism"><a class="link" href="#sort-mechanism">5.2. Sort mechanism</a></h3>
+<h3 id="switch-theme-mechanism"><a class="link" href="#switch-theme-mechanism">5.2. Switch Theme Mechanism</a></h3>
+<div class="paragraph">
+<p>The switch theme mechanism is facilitated by a <code>ThemesList</code>, which resides inside <code>AddressBook</code>. <code>ThemesList</code> contains a list of CSS files, in which each file are of differing colour themes for the application user interface. It sets the theme of the application to the theme specified by the index given by the user. This command will inherit from <code>Command</code>.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/SwitchThemeCommandDiagram1.png" alt="SwitchThemeCommandDiagram1" width="800">
+</div>
+</div>
+<div class="paragraph">
+<p>As seen from the diagram above, <code>SwitchThemeCommand</code> inherits <code>Command</code>, which means its state is not saved by the address book, and it cannot be undone after executing the command.</p>
+</div>
+<div class="paragraph">
+<p>Suppose that the user has just launched the application. The <code>ThemesList</code> will be initialised based on the current existing colour themes.</p>
+</div>
+<div class="paragraph">
+<p>The user executes <code>themeslist</code> to look through the existing colour themes, and pick one that he or she wants.</p>
+</div>
+<div class="paragraph">
+<p>The user will then execute <code>switch 2</code>, with <code>2</code> being the <code>index</code> of the theme that the user prefers, provided by the executed <code>themeslist</code>.</p>
+</div>
+<div class="paragraph">
+<p>The <code>ThemesList</code> will take the <code>index</code> provided by the user, and return a <code>String</code> of the CSS file name based on the <code>index</code>.</p>
+</div>
+<div class="paragraph">
+<p>The execution of <code>switch 2</code> toggles an event <code>ChangeThemeRequestEvent</code>, which will then be listened and handled by <code>MainWindow</code>.</p>
+</div>
+<div class="paragraph">
+<p>The <code>Stylesheets</code> of the <code>MainWindow</code> will then remove the current existing CSS file, which is the current theme, and add the given <code>String</code> of the CSS file into <code>Stylesheets</code>. That will set the current colour theme of <code>The Myth&#8217;s Book</code> to the preferred colour theme.</p>
+</div>
+<div class="paragraph">
+<p>Code of SwitchThemeCommand :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="directive">public</span> <span class="type">class</span> <span class="class">SwitchThemeCommand</span> <span class="directive">extends</span> Command {
+    <span class="annotation">@Override</span>
+    <span class="directive">public</span> CommandResult execute() {
+        <span class="comment">// ... switch theme logic ...</span>
+        EventsCenter.getInstance().post(<span class="keyword">new</span> ChangeThemeRequestEvent(themeToChange));
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Listener for ChangeThemeRequestEvent in MainWindow.java :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@Subscribe</span>
+<span class="directive">private</span> <span class="type">void</span> handleChangeThemeEvent(ChangeThemeRequestEvent event) {
+    logger.info(LogsCenter.getEventHandlingLogMessage(event));
+    handleChangeTheme(event.theme);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Removing and adding of CSS file into Stylesheets in MainWindow.java :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="directive">public</span> <span class="type">void</span> handleChangeTheme(<span class="predefined-type">String</span> theme) {
+    <span class="keyword">if</span> (getRoot().getStylesheets().size() &gt; <span class="integer">1</span>) {
+        getRoot().getStylesheets().remove(CURRENT_THEME_INDEX);
+    }
+    getRoot().getStylesheets().add(<span class="string"><span class="delimiter">&quot;</span><span class="content">/view/</span><span class="delimiter">&quot;</span></span> + theme);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The following sequence diagram shows how the switch theme operation works:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/SwitchThemeCommandDiagram2.png" alt="SwitchThemeCommandDiagram2" width="800">
+</div>
+</div>
+<div class="paragraph">
+<p>As seen from the diagram above, when <code>switch 1</code> is typed into the command line input, a new <code>SwitchThemeCommand</code> is created.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/SwitchThemeCommandDiagram3.png" alt="SwitchThemeCommandDiagram3" width="800">
+</div>
+</div>
+<div class="paragraph">
+<p>As seen from the diagram above, when <code>switch 1</code> is executed in <code>SwitchThemeCommand</code>, it will post <code>ChangeThemeRequestEvent</code> to the <code>EventsCenter</code>.</p>
+</div>
+<div class="paragraph">
+<p>Upon detecting <code>ChangeThemeRequestEvent</code>, <code>Ui</code> will call <code>handleChangeTheme</code> to handle the event, update the <code>MainWindow</code> accordingly and update its status bar.</p>
+</div>
+<div class="sect3">
+<h4 id="design-considerations-2"><a class="link" href="#design-considerations-2">5.2.1. Design Considerations</a></h4>
+<div class="paragraph">
+<p><strong>Aspect:</strong> Implementation of <code>SwitchThemeCommand</code><br>
+<strong>Alternative 1 (current choice):</strong> Extending to <code>Command</code> class.<br>
+<strong>Pros:</strong> Developers do not need to learn the implementation of <code>UndoableCommand</code> class.<br>
+<strong>Cons:</strong> <code>SwitchThemeCommand</code> cannot be undone and have to repeatedly call command to switch to different themes.<br>
+<strong>Alternative 2:</strong> Extending to <code>UndoableCommand</code> class.<br>
+<strong>Pros:</strong> Might be more favourable to users to undo <code>SwitchThemeCommand</code> if he/she switch to an incorrect theme.<br>
+<strong>Cons:</strong> Developers need to learn the implementation of <code>UndoableCommand</code>. Difficult to implement.<br></p>
+</div>
+<hr>
+<div class="paragraph">
+<p><strong>Aspect:</strong> How switch theme executes<br>
+<strong>Alternative 1 (current choice):</strong> Taking in index (type Integer) as the argument.<br>
+<strong>Pros:</strong> Simple to implement since the index will tally with <code>ThemesList</code>. Simple to use since users don&#8217;t have to remember the names and look at the index in <code>ThemesList</code>.<br>
+<strong>Cons:</strong> Maybe less favourable for users when the size of <code>ThemesList</code> increase.<br>
+<strong>Alternative 2:</strong> Taking in theme&#8217;s name (type String) as the argument.<br>
+<strong>Pros:</strong> Might be more favourable for long-time users since names may be easier to remember than numbers after using the application for a long time.<br>
+<strong>Cons:</strong> Harder to implement and test.<br></p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="sort-mechanism"><a class="link" href="#sort-mechanism">5.3. Sort mechanism</a></h3>
 <div class="paragraph">
 <p>The sort mechanism sorts the names of people inside the <code>addressbook</code> which
 is inside the 'ModelManager'. It organizes the position of the people existing in
@@ -913,7 +1029,7 @@ It will call the sort() function of its own class until it reaches InternalList.
 </div>
 </div>
 <div class="sect3">
-<h4 id="design-considerations-2"><a class="link" href="#design-considerations-2">5.2.1. Design Considerations</a></h4>
+<h4 id="design-considerations-3"><a class="link" href="#design-considerations-3">5.3.1. Design Considerations</a></h4>
 <div class="paragraph">
 <p><strong>Aspect:</strong> Implementation of <code>SortCommand</code><br>
 <strong>Alternative 1 (current choice):</strong> extending to <code>UndoableCommand</code> class<br>
@@ -939,7 +1055,7 @@ It will call the sort() function of its own class until it reaches InternalList.
 </div>
 </div>
 <div class="sect2">
-<h3 id="access-website-mechanism"><a class="link" href="#access-website-mechanism">5.3. Access Website mechanism</a></h3>
+<h3 id="access-website-mechanism"><a class="link" href="#access-website-mechanism">5.4. Access Website mechanism</a></h3>
 <div class="paragraph">
 <p>The access website mechanism has an <code>AccessCommand</code> that allows user to access the website by stating the
 index of the desired contact in the contact list viewed. The <code>AccessCommand</code> class inherits from the <code>Command</code> class.</p>
@@ -1046,7 +1162,7 @@ The website will then be loaded onto the browser of the <code>BrowserPanel</code
 </div>
 </div>
 <div class="sect3">
-<h4 id="design-considerations-3"><a class="link" href="#design-considerations-3">5.3.1. Design Considerations</a></h4>
+<h4 id="design-considerations-4"><a class="link" href="#design-considerations-4">5.4.1. Design Considerations</a></h4>
 <div class="paragraph">
 <p><strong>Aspect:</strong> How accessing a website of a person executes<br>
 <strong>Alternative 1 (current choice):</strong> Create a new event request and event handler for AccessCommand.<br>
@@ -1061,7 +1177,7 @@ which is important for GUI enhancement.<br></p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="find-mechanism"><a class="link" href="#find-mechanism">5.4. Find Mechanism</a></h3>
+<h3 id="find-mechanism"><a class="link" href="#find-mechanism">5.5. Find Mechanism</a></h3>
 <div class="paragraph">
 <p>The find mechanism is facilitated by the <code>NameContainsKeyWordsPredicate</code> class which resides in the person class. It supports finding any person in the address book using their full name or a part of the name.</p>
 </div>
@@ -1127,7 +1243,7 @@ which is important for GUI enhancement.<br></p>
 <p>If yes, then the function returns true else it returns false.</p>
 </div>
 <div class="sect3">
-<h4 id="design-considerations-4"><a class="link" href="#design-considerations-4">5.4.1. Design Considerations</a></h4>
+<h4 id="design-considerations-5"><a class="link" href="#design-considerations-5">5.5.1. Design Considerations</a></h4>
 <div class="paragraph">
 <p><strong>Aspect:</strong> Implementation of <code>containsPartOfWord</code><br>
 <strong>Alternative 1 (current choice):</strong> length&gt;=2<br>
@@ -1140,7 +1256,7 @@ which is important for GUI enhancement.<br></p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="logging"><a class="link" href="#logging">5.5. Logging</a></h3>
+<h3 id="logging"><a class="link" href="#logging">5.6. Logging</a></h3>
 <div class="paragraph">
 <p>We are using <code>java.util.logging</code> package for logging. The <code>LogsCenter</code> class is used to manage the logging levels and logging destinations.</p>
 </div>
@@ -1178,7 +1294,7 @@ which is important for GUI enhancement.<br></p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="configuration"><a class="link" href="#configuration">5.6. Configuration</a></h3>
+<h3 id="configuration"><a class="link" href="#configuration">5.7. Configuration</a></h3>
 <div class="paragraph">
 <p>Certain properties of the application can be controlled (e.g App name, logging level) through the configuration file (default: <code>config.json</code>).</p>
 </div>
@@ -2767,7 +2883,7 @@ as well as rich internet applications (RIAs) that can run across a wide variety 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-10-19 05:35:51 +00:00
+Last updated 2017-10-19 06:15:12 +00:00
 </div>
 </div>
 </body>
