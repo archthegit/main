@@ -1704,6 +1704,38 @@ Do take a look at the <a href="#storage-component">Design: Storage Component</a>
 <ol class="arabic">
 <li>
 <p>Add a new method <code>backupAddressBook(ReadOnlyAddressBook)</code>, so that the address book can be saved in a fixed temporary location.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>The new backUpAddressBook stores the address book at a back up location.</p>
+</div>
+<div class="paragraph">
+<p>private AddressBookStorage backUpLocation;</p>
+</div>
+<div class="paragraph">
+<p>public StorageManager(AddressBookStorage addressBookStorage, UserPrefsStorage userPrefsStorage) {
+    super();
+    this.addressBookStorage = addressBookStorage;
+    this.userPrefsStorage = userPrefsStorage;
+    this.backUpLocation = new XmlAddressBookStorage(addressBookStorage.getAddressBookFilePath());
+}</p>
+</div>
+<div class="paragraph">
+<p>public Optional&lt;ReadOnlyAddressBook&gt; readBackupAddressBook() throws DataConversionException, IOException {
+    return readAddressBook(backUpLocation.getAddressBookFilePath());
+}</p>
+</div>
+<div class="paragraph">
+<p>private void backUpAddressBook(ReadOnlyAddressBook addressBook) throws IOException {
+    String backupPath = backUpLocation.getAddressBookFilePath();
+    logger.fine("Backing up data to: " + backupPath);
+    saveAddressBook(addressBook, backupPath);
+}</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
 <div class="sidebarblock">
 <div class="content">
 <div class="ulist">
@@ -1734,9 +1766,6 @@ Do take a look at the <a href="#storage-component">Design: Storage Component</a>
 </ul>
 </div>
 </div>
-</div>
-</li>
-</ol>
 </div>
 <div class="paragraph">
 <p>=== Creating a new command: <code>remark</code></p>
@@ -2657,7 +2686,7 @@ as well as rich internet applications (RIAs) that can run across a wide variety 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-10-19 05:24:36 +00:00
+Last updated 2017-10-19 05:31:14 +00:00
 </div>
 </div>
 </body>
