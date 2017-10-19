@@ -47,56 +47,10 @@
 <li><a href="#implementation">5. Implementation</a>
 <ul class="sectlevel2">
 <li><a href="#undo-redo-mechanism">5.1. Undo/Redo mechanism</a></li>
+<li><a href="#sort-mechanism">5.2. Sort mechanism</a></li>
+<li><a href="#access-website-mechanism">5.3. Access Website mechanism</a></li>
 </ul>
 </li>
-<li><a href="#find-mechanism">6. Find Mechanism</a>
-<ul class="sectlevel3">
-<li><a href="#design-considerations-2">6.1. Design Considerations</a></li>
-<li><a href="#logging">6.2. Logging</a></li>
-<li><a href="#configuration">6.3. Configuration</a></li>
-</ul>
-</li>
-<li><a href="#documentation">7. Documentation</a>
-<ul class="sectlevel2">
-<li><a href="#editing-documentation">7.1. Editing Documentation</a></li>
-<li><a href="#publishing-documentation">7.2. Publishing Documentation</a></li>
-<li><a href="#converting-documentation-to-pdf-format">7.3. Converting Documentation to PDF format</a></li>
-</ul>
-</li>
-<li><a href="#testing">8. Testing</a>
-<ul class="sectlevel2">
-<li><a href="#running-tests">8.1. Running Tests</a></li>
-<li><a href="#types-of-tests">8.2. Types of tests</a></li>
-<li><a href="#troubleshooting-testing">8.3. Troubleshooting Testing</a></li>
-</ul>
-</li>
-<li><a href="#dev-ops">9. Dev Ops</a>
-<ul class="sectlevel2">
-<li><a href="#build-automation">9.1. Build Automation</a></li>
-<li><a href="#continuous-integration">9.2. Continuous Integration</a></li>
-<li><a href="#making-a-release">9.3. Making a Release</a></li>
-<li><a href="#managing-dependencies">9.4. Managing Dependencies</a></li>
-</ul>
-</li>
-<li><a href="#suggested-programming-tasks-to-get-started">Appendix A: Suggested Programming Tasks to Get Started</a>
-<ul class="sectlevel2">
-<li><a href="#improving-each-component">A.1. Improving each component</a></li>
-<li><a href="#creating-a-new-command-code-remark-code">A.2. Creating a new command: <code>remark</code></a></li>
-</ul>
-</li>
-<li><a href="#user-stories">Appendix B: User Stories</a></li>
-<li><a href="#use-cases">Appendix C: Use Cases</a>
-<ul class="sectlevel2">
-<li><a href="#use-case-sort-list">C.1. Use case: Sort list</a></li>
-<li><a href="#use-case-find-person">C.2. Use case: Find person</a></li>
-<li><a href="#use-case-add-person">C.3. Use case: Add person</a></li>
-<li><a href="#use-case-undo-command">C.4. Use case: Undo command</a></li>
-<li><a href="#use-case-list-persons">C.5. Use case: List persons</a></li>
-</ul>
-</li>
-<li><a href="#non-functional-requirements">Appendix D: Non Functional Requirements</a></li>
-<li><a href="#glossary">Appendix E: Glossary</a></li>
-<li><a href="#product-survey">Appendix F: Product Survey</a></li>
 </ul>
 </div>
 </div>
@@ -807,13 +761,265 @@ If the <code>redoStack</code> is empty, then there are no other commands left to
 </div>
 </div>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="find-mechanism"><a class="link" href="#find-mechanism">6. Find Mechanism</a></h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="sort-mechanism"><a class="link" href="#sort-mechanism">5.2. Sort mechanism</a></h3>
 <div class="paragraph">
-<p>The find mechanism is facilitated by the <code>NameContainsKeyWordsPredicate</code> class which resides in the person class. It supports finding any person in the address book using their full name or a part of the name.</p>
+<p>The sort mechanism sorts the names of people inside the <code>addressbook</code> which
+is inside the 'ModelManager'. It organizes the position of the people existing in
+the addressbook based on their names in an alphabetical order. The sort command inherits
+from UndoableCommand.</p>
+</div>
+<div class="paragraph">
+<p>From Figure 5.2.1 below, it is visible that <code>SortCommand</code> inherits from <code>UndoableCommand</code>
+which is an extra layer between abstract <code>Command</code> class in which the SortCommand
+can be undoable, where the previous state of the address book before sorting
+is saved.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/SortCommandLogicClassDiagram.PNG" alt="SortCommandLogicClassDiagram" width="800">
+</div>
+</div>
+<div class="paragraph">
+<p>Figure 5.2.1 SortCommand Logic Class Diagram</p>
+</div>
+<div class="paragraph">
+<p>Suppose a user has an unorganized list of contacts and executes the
+<code>SortCommand</code> to organize his contacts based on their names in an
+alphabetical order.</p>
+</div>
+<div class="paragraph">
+<p>The execution of SortCommand is processed in this way:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>User will execute a new <code>SortCommand</code> so as to sort the address book.</p>
+</li>
+<li>
+<p>This is carried out by <code>model.sort()</code> in <code>executeUndoableCommand()</code>.</p>
+</li>
+<li>
+<p>The <code>internalList</code> of the address book is accessed and is sorted through a <code>lambda</code> function which
+compares the name of everyone and necessarily switches the position between contacts throughout the <code>internalList</code> by comparing names between person r1 and r2 sequentially.</p>
+</li>
+<li>
+<p>After <code>internalList</code> is sorted, function <code>updateFilterPersonList(PREDICATE_SHOW_ALL_PERSONS)</code> is called
+to update the list being filtered and also call an event <code>indicatedAddressBookChanged()</code>
+to update the <code>PersonListPanel</code> of the GUI being shown.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Code of SortCommand :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="directive">public</span> <span class="type">class</span> <span class="class">SortCommand</span> <span class="directive">extends</span> UndoableCommand {
+    <span class="annotation">@Override</span>
+    <span class="directive">public</span> CommandResult executeUndoableCommand() {
+        model.sort();
+        <span class="keyword">return</span> <span class="keyword">new</span> CommandResult(MESSAGE_SUCCESS);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Sort method inside ModelManager.java :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@Override</span>
+<span class="directive">public</span> <span class="directive">synchronized</span> <span class="type">void</span> sort() {
+    addressBook.sort();
+    updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
+    indicateAddressBookChanged();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Sort method inside UniquePersonList.java :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="directive">public</span> <span class="type">void</span> sort() {
+    internalList.sort((r1, r2) -&gt; (
+            r1.getName().toString().compareTo(r2.getName().toString())));
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The following sequence diagram shows how the sort operation works:</p>
+</div>
+<div class="paragraph">
+<p>When sort is typed into command line input, new SortCommand is created.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/SortCommandLogicSequenceDiagram.PNG" alt="SortCommandLogicSequenceDiagram" width="800">
+</div>
+</div>
+<div class="paragraph">
+<p>When executeUndoableCommand is called in SortCommand class, it will call the sort function in ModelManager.
+It will call the sort() function of its own class until it reaches InternalList.sort() where the sorting of contacts based on their names will begin.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/SortCommandModelSequenceDiagram.PNG" alt="SortCommandModelSequenceDiagram" width="800">
+</div>
+</div>
+<div class="sect3">
+<h4 id="design-considerations-2"><a class="link" href="#design-considerations-2">5.2.1. Design Considerations</a></h4>
+<div class="paragraph">
+<p><strong>Aspect:</strong> Implementation of <code>SortCommand</code><br>
+<strong>Alternative 1 (current choice):</strong> extending to <code>UndoableCommand</code> class<br>
+<strong>Pros:</strong> Sort function call is able to be undone if needed as it now inherits from the Super Class.<br>
+<strong>Cons:</strong> Developers might need to understand how <code>UndoableCommand</code> works before implementation.<br>
+<strong>Alternative 2:</strong> Just extend to <code>Command</code> class<br>
+<strong>Pros:</strong> Does not need understanding of <code>UndoableCommand</code> class.<br>
+<strong>Cons:</strong> Unable to undo sort function and work from previous state of address book if user has called <code>SortCommand</code> to sort address book.</p>
+</div>
+<hr>
+<div class="paragraph">
+<p><strong>Aspect:</strong> Implementation of how sort executes<br>
+<strong>Alternative 1 (current choice):</strong> Compare and sort the names of every individual alphabetically.<br>
+<strong>Pros:</strong> Easy to implement and uses less complexity.<br>
+<strong>Cons:</strong> Unable to sort based on user preferences like email, phone number.<br>
+<strong>Alternative 2:</strong> Include all types of sorting like sorting phone numbers and emails.<br>
+<strong>Pros:</strong> Might be more favourable for user who have specific needs to collate certain information such as
+ email or phone number about his contacts in an alphanumeric order.<br>
+<strong>Cons:</strong> Difficult to implement and wastes memory space as sorting might be unnecessary and complex for general users
+          since main goal is to keep address book organized.<br></p>
+</div>
+<hr>
+</div>
+</div>
+<div class="sect2">
+<h3 id="access-website-mechanism"><a class="link" href="#access-website-mechanism">5.3. Access Website mechanism</a></h3>
+<div class="paragraph">
+<p>The access website mechanism has an <code>AccessCommand</code> that allows user to access the website by stating the
+index of the desired contact in the contact list viewed. The <code>AccessCommand</code> class inherits from the <code>Command</code> class.</p>
+</div>
+<div class="paragraph">
+<p>Suppose a user would like access one of his contacts website that is listed in the address book
+and executes the <code>AccessCommand</code> to access the website.</p>
+</div>
+<div class="paragraph">
+<p>The execution of AccessCommand is processed in this way:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>User will input <code>access index</code> where index refers to the index of the person listed in the person card list in GUI.</p>
+</li>
+<li>
+<p>Input of user will be parse as an argument through the AddressBookParser and AccessCommandParser to extract the index.</p>
+</li>
+<li>
+<p>A new <code>AccessCommand</code> with the index inputted will be executed.</p>
+</li>
+<li>
+<p>In the execute() of AccessCommand, the person of the website that the user wants to access will be obtained through the
+index of the <code>lastShownList</code> and stored into <code>ReadOnlyPerson</code> class variable.</p>
+</li>
+<li>
+<p>The <code>EventsCenter</code> will then post a new <code>AccessWebsiteRequestEvent</code> which contains the website of the person.</p>
+</li>
+<li>
+<p>The <code>AccessWebsiteRequestEvent</code> event would then be handled by an event handler <code>handleAccessWebsiteEvent</code>.</p>
+</li>
+<li>
+<p>The event handler will help to load the website of the person through the browser panel based on the website inputted.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Code of AccessCommand :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="directive">public</span> <span class="type">class</span> <span class="class">AccessCommand</span> <span class="directive">extends</span> Command {
+    <span class="directive">private</span> <span class="directive">final</span> Index targetIndex;
+
+    <span class="directive">public</span> AccessCommand(Index targetIndex) {
+        <span class="local-variable">this</span>.targetIndex = targetIndex;
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="directive">public</span> CommandResult execute() <span class="directive">throws</span> CommandException {
+        <span class="predefined-type">List</span>&lt;ReadOnlyPerson&gt; lastShownList = model.getFilteredPersonList();
+
+        <span class="keyword">if</span> (targetIndex.getZeroBased() &gt;= lastShownList.size()) {
+            <span class="keyword">throw</span> <span class="keyword">new</span> CommandException(Messages.MESSAGE_INVALID_DISPLAYED_INDEX);
+        }
+
+        ReadOnlyPerson person = lastShownList.get(targetIndex.getZeroBased());
+
+        EventsCenter.getInstance().post(<span class="keyword">new</span> AccessWebsiteRequestEvent(person.getWebsite().toString()));
+        <span class="keyword">return</span> <span class="keyword">new</span> CommandResult(<span class="predefined-type">String</span>.format(MESSAGE_ACCESS_PERSON_SUCCESS, targetIndex.getOneBased()));
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="directive">public</span> <span class="type">class</span> <span class="class">MainWindow</span> <span class="directive">extends</span> UiPart&lt;<span class="predefined-type">Region</span>&gt; {
+    <span class="directive">public</span> <span class="type">void</span> handleWebsiteAccess(<span class="predefined-type">String</span> website) {
+        browserPanel.loadPage(website);
+    }
+
+    <span class="annotation">@Subscribe</span>
+    <span class="directive">private</span> <span class="type">void</span> handleAccessWebsiteEvent(AccessWebsiteRequestEvent event) {
+        logger.info(LogsCenter.getEventHandlingLogMessage(event));
+        handleWebsiteAccess(event.website);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Through the sequence diagram, you can see how the code executes when a user
+inputs <code>access 1</code> into the command line.</p>
+</div>
+<div class="paragraph">
+<p>Sequence diagram for Logic Component of AccessCommand:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/AccessCommandLogicSequenceDiagram.PNG" alt="AccessCommandLogicSequenceDiagram" width="800">
+</div>
+</div>
+<div class="paragraph">
+<p>After creating a new <code>AccessCommand</code>, <code>LogicManager</code> will call execute on <code>AccessCommand</code>
+and this will result in the website of the person at the index inputted to be called through an event request and event handler.
+The website will then be loaded onto the browser of the <code>BrowserPanel</code> of the <code>MainWindow</code>.</p>
+</div>
+<div class="paragraph">
+<p>Sequence diagram for execute() of AccessCommand:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/AccessCommandEventsSequenceDiagram.PNG" alt="AccessCommandEventsSequenceDiagram" width="800">
+</div>
+</div>
+<div class="sect3">
+<h4 id="design-considerations-3"><a class="link" href="#design-considerations-3">5.3.1. Design Considerations</a></h4>
+<div class="paragraph">
+<p><strong>Aspect:</strong> How accessing a website of a person executes<br>
+<strong>Alternative 1 (current choice):</strong> Create a new event request and event handler for AccessCommand.<br>
+<strong>Pros:</strong> Able to have more features as AccessWebsite and Select feature is able to exist concurrently in the application.<br>
+<strong>Cons:</strong> Having the current select feature which is to search for names of contact of Google is quite unnecessary.<br>
+<strong>Alternative 2:</strong> Change the code of event request and event handler related to SelectCommand to allow users to access website of their contacts instead
+of creating a search on contacts name through he browser panel.<br>
+<strong>Pros:</strong> Select feature which seems unnecessary is replaced with a more useful feature of AccessWebsite.<br>
+<strong>Cons:</strong> Will not be able to replace the select feature anymore which might be important for other aspects such as creating a Person Card Viewer
+which is important for GUI enhancement.<br></p>
+</div>
+<hr>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>== Find Mechanism
+The find mechanism is facilitated by the <code>NameContainsKeyWordsPredicate</code> class which resides in the person class. It supports finding any person in the address book using their full name or a part of the name.</p>
 </div>
 <div class="paragraph">
 <p>However, if a user is searching by part of a name, the substring must be in the beginning of the first name or last name and it has to be at least two characters long.</p>
@@ -876,10 +1082,9 @@ If the <code>redoStack</code> is empty, then there are no other commands left to
 <div class="paragraph">
 <p>If yes, then the function returns true else it returns false.</p>
 </div>
-<div class="sect3">
-<h4 id="design-considerations-2"><a class="link" href="#design-considerations-2">6.1. Design Considerations</a></h4>
 <div class="paragraph">
-<p><strong>Aspect:</strong> Implementation of <code>containsPartOfWord</code><br>
+<p>==== Design Considerations
+<strong>Aspect:</strong> Implementation of <code>containsPartOfWord</code><br>
 <strong>Alternative 1 (current choice):</strong> length&gt;=2<br>
 <strong>Pros:</strong> Making sure that not every person&#8217;s name comes up in find. For e.g: 'find a'<br>
 <strong>Cons:</strong> There might exist people whose first or last name is stored as a single character<br>
@@ -887,9 +1092,9 @@ If the <code>redoStack</code> is empty, then there are no other commands left to
 <strong>Pros:</strong> No exception cases<br>
 <strong>Cons:</strong> No purpose of using find as if you search for one character, all contacts might get filtered<br></p>
 </div>
+<div class="paragraph">
+<p>=== Logging</p>
 </div>
-<div class="sect2">
-<h3 id="logging"><a class="link" href="#logging">6.2. Logging</a></h3>
 <div class="paragraph">
 <p>We are using <code>java.util.logging</code> package for logging. The <code>LogsCenter</code> class is used to manage the logging levels and logging destinations.</p>
 </div>
@@ -925,21 +1130,18 @@ If the <code>redoStack</code> is empty, then there are no other commands left to
 </li>
 </ul>
 </div>
+<div class="paragraph">
+<p>=== Configuration</p>
 </div>
-<div class="sect2">
-<h3 id="configuration"><a class="link" href="#configuration">6.3. Configuration</a></h3>
 <div class="paragraph">
 <p>Certain properties of the application can be controlled (e.g App name, logging level) through the configuration file (default: <code>config.json</code>).</p>
 </div>
 <div class="paragraph">
 <p><a href="#the-myths-book---developer-guide">Back To Top</a></p>
 </div>
+<div class="paragraph">
+<p>== Documentation</p>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="documentation"><a class="link" href="#documentation">7. Documentation</a></h2>
-<div class="sectionbody">
 <div class="paragraph">
 <p>We use asciidoc for writing documentation.</p>
 </div>
@@ -955,21 +1157,22 @@ We chose asciidoc over Markdown because asciidoc, although a bit more complex th
 </tr>
 </table>
 </div>
-<div class="sect2">
-<h3 id="editing-documentation"><a class="link" href="#editing-documentation">7.1. Editing Documentation</a></h3>
+<div class="paragraph">
+<p>=== Editing Documentation</p>
+</div>
 <div class="paragraph">
 <p>See <a href="UsingGradle.html#rendering-asciidoc-files">UsingGradle.adoc</a> to learn how to render <code>.adoc</code> files locally to preview the end result of your edits.
 Alternatively, you can download the AsciiDoc plugin for IntelliJ, which allows you to preview the changes you have made to your <code>.adoc</code> files in real-time.</p>
 </div>
+<div class="paragraph">
+<p>=== Publishing Documentation</p>
 </div>
-<div class="sect2">
-<h3 id="publishing-documentation"><a class="link" href="#publishing-documentation">7.2. Publishing Documentation</a></h3>
 <div class="paragraph">
 <p>See <a href="UsingTravis.html#deploying-github-pages">UsingTravis.adoc</a> to learn how to deploy GitHub Pages using Travis.</p>
 </div>
+<div class="paragraph">
+<p>=== Converting Documentation to PDF format</p>
 </div>
-<div class="sect2">
-<h3 id="converting-documentation-to-pdf-format"><a class="link" href="#converting-documentation-to-pdf-format">7.3. Converting Documentation to PDF format</a></h3>
 <div class="paragraph">
 <p>We use <a href="https://www.google.com/chrome/browser/desktop/">Google Chrome</a> for converting documentation to PDF format, as Chrome&#8217;s PDF engine preserves hyperlinks used in webpages.</p>
 </div>
@@ -1003,14 +1206,12 @@ Alternatively, you can download the AsciiDoc plugin for IntelliJ, which allows y
 <div class="paragraph">
 <p><a href="#the-myths-book---developer-guide">Back To Top</a></p>
 </div>
+<div class="paragraph">
+<p>== Testing</p>
 </div>
+<div class="paragraph">
+<p>=== Running Tests</p>
 </div>
-</div>
-<div class="sect1">
-<h2 id="testing"><a class="link" href="#testing">8. Testing</a></h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="running-tests"><a class="link" href="#running-tests">8.1. Running Tests</a></h3>
 <div class="paragraph">
 <p>There are three ways to run tests.</p>
 </div>
@@ -1070,9 +1271,9 @@ See <a href="UsingGradle.html">UsingGradle.adoc</a> for more info on how to run 
 <div class="paragraph">
 <p>To run tests in headless mode, open a console and run the command <code>gradlew clean headless allTests</code> (Mac/Linux: <code>./gradlew clean headless allTests</code>)</p>
 </div>
+<div class="paragraph">
+<p>=== Types of tests</p>
 </div>
-<div class="sect2">
-<h3 id="types-of-tests"><a class="link" href="#types-of-tests">8.2. Types of tests</a></h3>
 <div class="paragraph">
 <p>We have two types of tests:</p>
 </div>
@@ -1112,11 +1313,9 @@ e.g. <code>seedu.address.logic.LogicManagerTest</code></p>
 </li>
 </ol>
 </div>
-</div>
-<div class="sect2">
-<h3 id="troubleshooting-testing"><a class="link" href="#troubleshooting-testing">8.3. Troubleshooting Testing</a></h3>
 <div class="paragraph">
-<p><strong>Problem: <code>HelpWindowTest</code> fails with a <code>NullPointerException</code>.</strong></p>
+<p>=== Troubleshooting Testing
+<strong>Problem: <code>HelpWindowTest</code> fails with a <code>NullPointerException</code>.</strong></p>
 </div>
 <div class="ulist">
 <ul>
@@ -1131,26 +1330,24 @@ e.g. <code>seedu.address.logic.LogicManagerTest</code></p>
 <div class="paragraph">
 <p><a href="#the-myths-book---developer-guide">Back To Top</a></p>
 </div>
+<div class="paragraph">
+<p>== Dev Ops</p>
 </div>
+<div class="paragraph">
+<p>=== Build Automation</p>
 </div>
-</div>
-<div class="sect1">
-<h2 id="dev-ops"><a class="link" href="#dev-ops">9. Dev Ops</a></h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="build-automation"><a class="link" href="#build-automation">9.1. Build Automation</a></h3>
 <div class="paragraph">
 <p>See <a href="UsingGradle.html">UsingGradle.adoc</a> to learn how to use Gradle for build automation.</p>
 </div>
+<div class="paragraph">
+<p>=== Continuous Integration</p>
 </div>
-<div class="sect2">
-<h3 id="continuous-integration"><a class="link" href="#continuous-integration">9.2. Continuous Integration</a></h3>
 <div class="paragraph">
 <p>We use <a href="https://travis-ci.org/">Travis CI</a> and <a href="https://www.appveyor.com/">AppVeyor</a> to perform <em>Continuous Integration</em> on our projects. See <a href="UsingTravis.html">UsingTravis.adoc</a> and <a href="UsingAppVeyor.html">UsingAppVeyor.adoc</a> for more details.</p>
 </div>
+<div class="paragraph">
+<p>=== Making a Release</p>
 </div>
-<div class="sect2">
-<h3 id="making-a-release"><a class="link" href="#making-a-release">9.3. Making a Release</a></h3>
 <div class="paragraph">
 <p>Here are the steps to create a new release.</p>
 </div>
@@ -1170,9 +1367,9 @@ e.g. <code>seedu.address.logic.LogicManagerTest</code></p>
 </li>
 </ol>
 </div>
+<div class="paragraph">
+<p>=== Managing Dependencies</p>
 </div>
-<div class="sect2">
-<h3 id="managing-dependencies"><a class="link" href="#managing-dependencies">9.4. Managing Dependencies</a></h3>
 <div class="paragraph">
 <p>A project often depends on third-party libraries. For example, Address Book depends on the <a href="http://wiki.fasterxml.com/JacksonHome">Jackson library</a> for XML parsing. Managing these <em>dependencies</em> can be automated using Gradle. For example, Gradle can download the dependencies automatically, which is better than these alternatives.<br>
 a. Include those libraries in the repo (this bloats the repo size)<br>
@@ -1181,12 +1378,9 @@ b. Require developers to download those libraries manually (this creates extra w
 <div class="paragraph">
 <p><a href="#the-myths-book---developer-guide">Back To Top</a></p>
 </div>
+<div class="paragraph">
+<p>== Suggested Programming Tasks to Get Started</p>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="suggested-programming-tasks-to-get-started"><a class="link" href="#suggested-programming-tasks-to-get-started">Appendix A: Suggested Programming Tasks to Get Started</a></h2>
-<div class="sectionbody">
 <div class="paragraph">
 <p>Suggested path for new programmers:</p>
 </div>
@@ -1200,8 +1394,9 @@ b. Require developers to download those libraries manually (this creates extra w
 </li>
 </ol>
 </div>
-<div class="sect2">
-<h3 id="improving-each-component"><a class="link" href="#improving-each-component">A.1. Improving each component</a></h3>
+<div class="paragraph">
+<p>=== Improving each component</p>
+</div>
 <div class="paragraph">
 <p>Each individual exercise in this section is component-based (i.e. you would not need to modify the other components to get it to work).</p>
 </div>
@@ -1509,6 +1704,38 @@ Do take a look at the <a href="#storage-component">Design: Storage Component</a>
 <ol class="arabic">
 <li>
 <p>Add a new method <code>backupAddressBook(ReadOnlyAddressBook)</code>, so that the address book can be saved in a fixed temporary location.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>The new backUpAddressBook stores the address book at a back up location.</p>
+</div>
+<div class="paragraph">
+<p>private AddressBookStorage backUpLocation;</p>
+</div>
+<div class="paragraph">
+<p>public StorageManager(AddressBookStorage addressBookStorage, UserPrefsStorage userPrefsStorage) {
+    super();
+    this.addressBookStorage = addressBookStorage;
+    this.userPrefsStorage = userPrefsStorage;
+    this.backUpLocation = new XmlAddressBookStorage(addressBookStorage.getAddressBookFilePath());
+}</p>
+</div>
+<div class="paragraph">
+<p>public Optional&lt;ReadOnlyAddressBook&gt; readBackupAddressBook() throws DataConversionException, IOException {
+    return readAddressBook(backUpLocation.getAddressBookFilePath());
+}</p>
+</div>
+<div class="paragraph">
+<p>private void backUpAddressBook(ReadOnlyAddressBook addressBook) throws IOException {
+    String backupPath = backUpLocation.getAddressBookFilePath();
+    logger.fine("Backing up data to: " + backupPath);
+    saveAddressBook(addressBook, backupPath);
+}</p>
+</div>
+<div class="paragraph">
+<p>+</p>
+</div>
 <div class="sidebarblock">
 <div class="content">
 <div class="ulist">
@@ -1540,19 +1767,15 @@ Do take a look at the <a href="#storage-component">Design: Storage Component</a>
 </div>
 </div>
 </div>
-</li>
-</ol>
+<div class="paragraph">
+<p>=== Creating a new command: <code>remark</code></p>
 </div>
-</div>
-<div class="sect2">
-<h3 id="creating-a-new-command-code-remark-code"><a class="link" href="#creating-a-new-command-code-remark-code">A.2. Creating a new command: <code>remark</code></a></h3>
 <div class="paragraph">
 <p>By creating this command, you will get a chance to learn how to implement a feature end-to-end, touching all major components of the app.</p>
 </div>
-<div class="sect3">
-<h4 id="description"><a class="link" href="#description">A.2.1. Description</a></h4>
 <div class="paragraph">
-<p>Edits the remark for a person specified in the <code>INDEX</code>.<br>
+<p>==== Description
+Edits the remark for a person specified in the <code>INDEX</code>.<br>
 Format: <code>remark INDEX r/[REMARK]</code></p>
 </div>
 <div class="paragraph">
@@ -1570,13 +1793,12 @@ Removes the remark for the first person.</p>
 </li>
 </ul>
 </div>
-</div>
-<div class="sect3">
-<h4 id="step-by-step-instructions"><a class="link" href="#step-by-step-instructions">A.2.2. Step-by-step Instructions</a></h4>
-<div class="sect4">
-<h5 id="step-1-logic-teach-the-app-to-accept-remark-which-does-nothing"><a class="link" href="#step-1-logic-teach-the-app-to-accept-remark-which-does-nothing">[Step 1] Logic: Teach the app to accept 'remark' which does nothing</a></h5>
 <div class="paragraph">
-<p>Let&#8217;s start by teaching the application how to parse a <code>remark</code> command. We will add the logic of <code>remark</code> later.</p>
+<p>==== Step-by-step Instructions</p>
+</div>
+<div class="paragraph">
+<p>===== [Step 1] Logic: Teach the app to accept 'remark' which does nothing
+Let&#8217;s start by teaching the application how to parse a <code>remark</code> command. We will add the logic of <code>remark</code> later.</p>
 </div>
 <div class="paragraph">
 <p><strong>Main:</strong></p>
@@ -1604,11 +1826,9 @@ Removes the remark for the first person.</p>
 </li>
 </ol>
 </div>
-</div>
-<div class="sect4">
-<h5 id="step-2-logic-teach-the-app-to-accept-remark-arguments"><a class="link" href="#step-2-logic-teach-the-app-to-accept-remark-arguments">[Step 2] Logic: Teach the app to accept 'remark' arguments</a></h5>
 <div class="paragraph">
-<p>Let&#8217;s teach the application to parse arguments that our <code>remark</code> command will accept. E.g. <code>1 r/Likes to drink coffee.</code></p>
+<p>===== [Step 2] Logic: Teach the app to accept 'remark' arguments
+Let&#8217;s teach the application to parse arguments that our <code>remark</code> command will accept. E.g. <code>1 r/Likes to drink coffee.</code></p>
 </div>
 <div class="paragraph">
 <p><strong>Main:</strong></p>
@@ -1643,11 +1863,9 @@ for <code>RemarkCommandParser</code>.</p>
 </li>
 </ol>
 </div>
-</div>
-<div class="sect4">
-<h5 id="step-3-ui-add-a-placeholder-for-remark-in-code-personcard-code"><a class="link" href="#step-3-ui-add-a-placeholder-for-remark-in-code-personcard-code">[Step 3] Ui: Add a placeholder for remark in <code>PersonCard</code></a></h5>
 <div class="paragraph">
-<p>Let&#8217;s add a placeholder on all our <a href="https://github.com/se-edu/addressbook-level4/tree/master/src/main/java/seedu/address/ui/PersonCard.java"><code>PersonCard</code></a> s to display a remark for each person later.</p>
+<p>===== [Step 3] Ui: Add a placeholder for remark in <code>PersonCard</code>
+Let&#8217;s add a placeholder on all our <a href="https://github.com/se-edu/addressbook-level4/tree/master/src/main/java/seedu/address/ui/PersonCard.java"><code>PersonCard</code></a> s to display a remark for each person later.</p>
 </div>
 <div class="paragraph">
 <p><strong>Main:</strong></p>
@@ -1672,11 +1890,9 @@ for <code>RemarkCommandParser</code>.</p>
 </li>
 </ol>
 </div>
-</div>
-<div class="sect4">
-<h5 id="step-4-model-add-code-remark-code-class"><a class="link" href="#step-4-model-add-code-remark-code-class">[Step 4] Model: Add <code>Remark</code> class</a></h5>
 <div class="paragraph">
-<p>We have to properly encapsulate the remark in our <a href="https://github.com/se-edu/addressbook-level4/tree/master/src/main/java/seedu/address/model/person/ReadOnlyPerson.java"><code>ReadOnlyPerson</code></a> class. Instead of just using a <code>String</code>, let&#8217;s follow the conventional class structure that the codebase already uses by adding a <code>Remark</code> class.</p>
+<p>===== [Step 4] Model: Add <code>Remark</code> class
+We have to properly encapsulate the remark in our <a href="https://github.com/se-edu/addressbook-level4/tree/master/src/main/java/seedu/address/model/person/ReadOnlyPerson.java"><code>ReadOnlyPerson</code></a> class. Instead of just using a <code>String</code>, let&#8217;s follow the conventional class structure that the codebase already uses by adding a <code>Remark</code> class.</p>
 </div>
 <div class="paragraph">
 <p><strong>Main:</strong></p>
@@ -1701,11 +1917,9 @@ for <code>RemarkCommandParser</code>.</p>
 </li>
 </ol>
 </div>
-</div>
-<div class="sect4">
-<h5 id="step-5-model-modify-code-readonlyperson-code-to-support-a-code-remark-code-field"><a class="link" href="#step-5-model-modify-code-readonlyperson-code-to-support-a-code-remark-code-field">[Step 5] Model: Modify <code>ReadOnlyPerson</code> to support a <code>Remark</code> field</a></h5>
 <div class="paragraph">
-<p>Now we have the <code>Remark</code> class, we need to actually use it inside <a href="https://github.com/se-edu/addressbook-level4/tree/master/src/main/java/seedu/address/model/person/ReadOnlyPerson.java"><code>ReadOnlyPerson</code></a>.</p>
+<p>===== [Step 5] Model: Modify <code>ReadOnlyPerson</code> to support a <code>Remark</code> field
+Now we have the <code>Remark</code> class, we need to actually use it inside <a href="https://github.com/se-edu/addressbook-level4/tree/master/src/main/java/seedu/address/model/person/ReadOnlyPerson.java"><code>ReadOnlyPerson</code></a>.</p>
 </div>
 <div class="paragraph">
 <p><strong>Main:</strong></p>
@@ -1723,11 +1937,9 @@ for <code>RemarkCommandParser</code>.</p>
 </li>
 </ol>
 </div>
-</div>
-<div class="sect4">
-<h5 id="step-6-storage-add-code-remark-code-field-to-code-xmladaptedperson-code-class"><a class="link" href="#step-6-storage-add-code-remark-code-field-to-code-xmladaptedperson-code-class">[Step 6] Storage: Add <code>Remark</code> field to <code>XmlAdaptedPerson</code> class</a></h5>
 <div class="paragraph">
-<p>We now have <code>Remark</code> s for <code>Person</code> s, but they will be gone when we exit the application. Let&#8217;s modify <a href="https://github.com/se-edu/addressbook-level4/tree/master/src/main/java/seedu/address/storage/XmlAdaptedPerson.java"><code>XmlAdaptedPerson</code></a> to include a <code>Remark</code> field so that it will be saved.</p>
+<p>===== [Step 6] Storage: Add <code>Remark</code> field to <code>XmlAdaptedPerson</code> class
+We now have <code>Remark</code> s for <code>Person</code> s, but they will be gone when we exit the application. Let&#8217;s modify <a href="https://github.com/se-edu/addressbook-level4/tree/master/src/main/java/seedu/address/storage/XmlAdaptedPerson.java"><code>XmlAdaptedPerson</code></a> to include a <code>Remark</code> field so that it will be saved.</p>
 </div>
 <div class="paragraph">
 <p><strong>Main:</strong></p>
@@ -1752,11 +1964,9 @@ for <code>RemarkCommandParser</code>.</p>
 </li>
 </ol>
 </div>
-</div>
-<div class="sect4">
-<h5 id="step-7-ui-connect-code-remark-code-field-to-code-personcard-code"><a class="link" href="#step-7-ui-connect-code-remark-code-field-to-code-personcard-code">[Step 7] Ui: Connect <code>Remark</code> field to <code>PersonCard</code></a></h5>
 <div class="paragraph">
-<p>Our remark label in <a href="https://github.com/se-edu/addressbook-level4/tree/master/src/main/java/seedu/address/ui/PersonCard.java"><code>PersonCard</code></a> is still a placeholder. Let&#8217;s bring it to life by binding it with the actual <code>remark</code> field.</p>
+<p>===== [Step 7] Ui: Connect <code>Remark</code> field to <code>PersonCard</code>
+Our remark label in <a href="https://github.com/se-edu/addressbook-level4/tree/master/src/main/java/seedu/address/ui/PersonCard.java"><code>PersonCard</code></a> is still a placeholder. Let&#8217;s bring it to life by binding it with the actual <code>remark</code> field.</p>
 </div>
 <div class="paragraph">
 <p><strong>Main:</strong></p>
@@ -1781,11 +1991,9 @@ for <code>RemarkCommandParser</code>.</p>
 </li>
 </ol>
 </div>
-</div>
-<div class="sect4">
-<h5 id="step-8-logic-implement-code-remarkcommand-execute-code-logic"><a class="link" href="#step-8-logic-implement-code-remarkcommand-execute-code-logic">[Step 8] Logic: Implement <code>RemarkCommand#execute()</code> logic</a></h5>
 <div class="paragraph">
-<p>We now have everything set up&#8230;&#8203; but we still can&#8217;t modify the remarks. Let&#8217;s finish it up by adding in actual logic for our <code>remark</code> command.</p>
+<p>===== [Step 8] Logic: Implement <code>RemarkCommand#execute()</code> logic
+We now have everything set up&#8230;&#8203; but we still can&#8217;t modify the remarks. Let&#8217;s finish it up by adding in actual logic for our <code>remark</code> command.</p>
 </div>
 <div class="paragraph">
 <p><strong>Main:</strong></p>
@@ -1807,23 +2015,18 @@ for <code>RemarkCommandParser</code>.</p>
 </li>
 </ol>
 </div>
+<div class="paragraph">
+<p>==== Full Solution</p>
 </div>
-</div>
-<div class="sect3">
-<h4 id="full-solution"><a class="link" href="#full-solution">A.2.3. Full Solution</a></h4>
 <div class="paragraph">
 <p>See this <a href="https://github.com/se-edu/addressbook-level4/pull/599">PR</a> for the step-by-step solution.</p>
 </div>
 <div class="paragraph">
 <p><a href="#the-myths-book---developer-guide">Back To Top</a></p>
 </div>
+<div class="paragraph">
+<p>== User Stories</p>
 </div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="user-stories"><a class="link" href="#user-stories">Appendix B: User Stories</a></h2>
-<div class="sectionbody">
 <div class="paragraph">
 <p>Priorities: High (must have) - <code>* * *</code>, Medium (nice to have) - <code>* *</code>, Low (unlikely to have) - <code>*</code></p>
 </div>
@@ -2063,11 +2266,9 @@ Task-oriented user - a user who prefers to have purposeful functions which would
 <div class="paragraph">
 <p><a href="#the-myths-book---developer-guide">Back To Top</a></p>
 </div>
+<div class="paragraph">
+<p>== Use Cases</p>
 </div>
-</div>
-<div class="sect1">
-<h2 id="use-cases"><a class="link" href="#use-cases">Appendix C: Use Cases</a></h2>
-<div class="sectionbody">
 <div class="paragraph">
 <p>(For all use cases below, the <strong>System</strong> is the <code>AddressBook</code> and the <strong>Actor</strong> is the <code>user</code>, unless specified otherwise)</p>
 </div>
@@ -2120,8 +2321,9 @@ Task-oriented user - a user who prefers to have purposeful functions which would
 </li>
 </ul>
 </div>
-<div class="sect2">
-<h3 id="use-case-sort-list"><a class="link" href="#use-case-sort-list">C.1. Use case: Sort list</a></h3>
+<div class="paragraph">
+<p>=== Use case: Sort list</p>
+</div>
 <div class="paragraph">
 <p><strong>MSS</strong></p>
 </div>
@@ -2170,9 +2372,9 @@ Task-oriented user - a user who prefers to have purposeful functions which would
 </li>
 </ul>
 </div>
+<div class="paragraph">
+<p>=== Use case: Find person</p>
 </div>
-<div class="sect2">
-<h3 id="use-case-find-person"><a class="link" href="#use-case-find-person">C.2. Use case: Find person</a></h3>
 <div class="paragraph">
 <p><strong>MSS</strong></p>
 </div>
@@ -2192,9 +2394,9 @@ Task-oriented user - a user who prefers to have purposeful functions which would
 <div class="paragraph">
 <p><strong>Extensions</strong></p>
 </div>
+<div class="paragraph">
+<p>=== Use case: Add person</p>
 </div>
-<div class="sect2">
-<h3 id="use-case-add-person"><a class="link" href="#use-case-add-person">C.3. Use case: Add person</a></h3>
 <div class="paragraph">
 <p><strong>MSS</strong></p>
 </div>
@@ -2262,9 +2464,9 @@ Task-oriented user - a user who prefers to have purposeful functions which would
 </li>
 </ul>
 </div>
+<div class="paragraph">
+<p>=== Use case: Undo command</p>
 </div>
-<div class="sect2">
-<h3 id="use-case-undo-command"><a class="link" href="#use-case-undo-command">C.4. Use case: Undo command</a></h3>
 <div class="paragraph">
 <p><strong>MSS</strong></p>
 </div>
@@ -2307,9 +2509,9 @@ Task-oriented user - a user who prefers to have purposeful functions which would
 </li>
 </ul>
 </div>
+<div class="paragraph">
+<p>=== Use case: List persons</p>
 </div>
-<div class="sect2">
-<h3 id="use-case-list-persons"><a class="link" href="#use-case-list-persons">C.5. Use case: List persons</a></h3>
 <div class="paragraph">
 <p><strong>MSS</strong></p>
 </div>
@@ -2345,12 +2547,9 @@ Task-oriented user - a user who prefers to have purposeful functions which would
 <div class="paragraph">
 <p><a href="#the-myths-book---developer-guide">Back To Top</a></p>
 </div>
+<div class="paragraph">
+<p>== Non Functional Requirements</p>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="non-functional-requirements"><a class="link" href="#non-functional-requirements">Appendix D: Non Functional Requirements</a></h2>
-<div class="sectionbody">
 <div class="olist arabic">
 <ol class="arabic">
 <li>
@@ -2391,11 +2590,9 @@ Task-oriented user - a user who prefers to have purposeful functions which would
 <div class="paragraph">
 <p><a href="#the-myths-book---developer-guide">Back To Top</a></p>
 </div>
+<div class="paragraph">
+<p>== Glossary</p>
 </div>
-</div>
-<div class="sect1">
-<h2 id="glossary"><a class="link" href="#glossary">Appendix E: Glossary</a></h2>
-<div class="sectionbody">
 <div id="mainstream-os" class="paragraph">
 <p>Mainstream OS</p>
 </div>
@@ -2442,11 +2639,9 @@ as well as rich internet applications (RIAs) that can run across a wide variety 
 <div class="paragraph">
 <p><a href="#the-myths-book---developer-guide">Back To Top</a></p>
 </div>
+<div class="paragraph">
+<p>== Product Survey</p>
 </div>
-</div>
-<div class="sect1">
-<h2 id="product-survey"><a class="link" href="#product-survey">Appendix F: Product Survey</a></h2>
-<div class="sectionbody">
 <div class="paragraph">
 <p><strong>Product Name</strong></p>
 </div>
@@ -2485,9 +2680,13 @@ as well as rich internet applications (RIAs) that can run across a wide variety 
 </div>
 </div>
 </div>
+</div>
+</div>
+</div>
+</div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-10-19 05:18:37 +00:00
+Last updated 2017-10-19 05:24:18 +00:00
 </div>
 </div>
 </body>
