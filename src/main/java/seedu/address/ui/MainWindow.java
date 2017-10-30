@@ -305,11 +305,10 @@ public class MainWindow extends UiPart<Region> {
     @Subscribe
     private void handlePanelSwitchEvent(PanelSwitchRequestEvent event) {
         logger.info(LogsCenter.getEventHandlingLogMessage(event));
-        if (event.wantedPanel.toString().equals(EventsCommand.COMMAND_WORD)){
+        if (event.wantedPanel.toString().equals(EventsCommand.COMMAND_WORD)) {
             personListPanelPlaceholder.getChildren().remove(personListPanel.getRoot());
             eventsListPanelPlaceholder.getChildren().add(eventsListPanel.getRoot());
-        }
-        else {
+        } else {
             eventsListPanelPlaceholder.getChildren().remove(eventsListPanel.getRoot());
             personListPanelPlaceholder.getChildren().add(personListPanel.getRoot());
         }

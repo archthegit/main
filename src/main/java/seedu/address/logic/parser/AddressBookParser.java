@@ -59,8 +59,10 @@ public class AddressBookParser {
         final String commandWord = matcher.group("commandWord");
         final String arguments = matcher.group("arguments");
         switch (commandWord) {
+
         case AddCommand.COMMAND_WORD: case AddCommand.COMMAND_ALIAS:
             return new AddCommandParser().parse(arguments);
+
         case AccessCommand.COMMAND_WORD:
             return new AccessCommandParser().parse(arguments);
 
@@ -127,7 +129,7 @@ public class AddressBookParser {
         case BirthdaysCommand.COMMAND_WORD: case BirthdaysCommand.COMMAND_ALIAS:
             return new BirthdaysCommand();
 
-            case EventsCommand.COMMAND_WORD: case EventsCommand.COMMAND_ALIAS:
+        case EventsCommand.COMMAND_WORD: case EventsCommand.COMMAND_ALIAS:
                 return new EventsCommand();
         default:
             throw new ParseException(MESSAGE_UNKNOWN_COMMAND);

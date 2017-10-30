@@ -6,8 +6,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.function.Predicate;
 
+/**
+ * Predicate class checks if a given event falls within the month
+ */
 public class EventPredicate implements Predicate<ReadOnlyEvent> {
 
+    /**
+     * Default constructor for EventPredicate Class
+     */
     public EventPredicate() {
     }
 
@@ -21,13 +27,13 @@ public class EventPredicate implements Predicate<ReadOnlyEvent> {
 
     @Override
     public boolean test(ReadOnlyEvent event) {
-            boolean val = false;
-            try {
-                val = checkIfEventFallsInMonth(event);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            return val;
+        boolean val = false;
+        try {
+            val = checkIfEventFallsInMonth(event);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return val;
     }
 
 

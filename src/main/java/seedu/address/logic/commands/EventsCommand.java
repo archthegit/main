@@ -2,8 +2,11 @@ package seedu.address.logic.commands;
 
 import seedu.address.commons.core.EventsCenter;
 import seedu.address.commons.events.ui.PanelSwitchRequestEvent;
-import seedu.address.model.event.*;
+import seedu.address.model.event.EventPredicate;
 
+/**
+ * Command to list events for the month
+ */
 public class EventsCommand extends Command {
     public static final String COMMAND_WORD = "events";
     public static final String COMMAND_ALIAS = "ev";
@@ -13,7 +16,7 @@ public class EventsCommand extends Command {
 
     private final EventPredicate predicate = new EventPredicate();
 
-    public EventsCommand( ) { }
+    public EventsCommand() { }
 
     @Override
     public CommandResult execute() {
