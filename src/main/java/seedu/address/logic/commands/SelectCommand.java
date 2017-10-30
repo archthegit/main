@@ -36,14 +36,14 @@ public class SelectCommand extends Command {
     public CommandResult execute() throws CommandException {
 
         List<ReadOnlyPerson> lastShownList = model.getFilteredPersonList();
+        ReadOnlyPerson person = lastShownList.get(targetIndex.getZeroBased());
+        String name = person.getName().toString();
 
         if (targetIndex.getZeroBased() >= lastShownList.size()) {
             throw new CommandException(Messages.MESSAGE_INVALID_DISPLAYED_INDEX);
         }
 
         EventsCenter.getInstance().post(new PanelSwitchRequestEvent(COMMAND_WORD));
-        ReadOnlyPerson person = lastShownList.get(targetIndex.getZeroBased());
-        String name = person.getName().toString();
         EventsCenter.getInstance().post(new AccessWebsiteRequestEvent(person.getWebsite().toString()));
         EventsCenter.getInstance().post(new JumpToListRequestEvent(targetIndex));
         return new CommandResult(String.format(MESSAGE_SELECT_PERSON_SUCCESS, targetIndex.getOneBased(), name));
