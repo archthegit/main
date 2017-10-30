@@ -20,11 +20,13 @@ import seedu.address.commons.core.GuiSettings;
 import seedu.address.commons.core.LogsCenter;
 import seedu.address.commons.events.ui.ChangeThemeRequestEvent;
 import seedu.address.commons.events.ui.ExitAppRequestEvent;
+import seedu.address.commons.events.ui.PanelSwitchRequestEvent;
 import seedu.address.commons.events.ui.ShowHelpRequestEvent;
 
 import seedu.address.commons.events.ui.ShowThemeRequestEvent;
 import seedu.address.commons.util.FxViewUtil;
 import seedu.address.logic.Logic;
+import seedu.address.logic.commands.EventsCommand;
 import seedu.address.model.UserPrefs;
 
 /**
@@ -49,6 +51,7 @@ public class MainWindow extends UiPart<Region> {
     private BrowserPanel browserPanel;
     private DetailsPanel detailsPanel;
     private PersonListPanel personListPanel;
+    private EventsListPanel eventsListPanel;
     private Config config;
     private UserPrefs prefs;
     private Calendar calendar;
@@ -67,6 +70,9 @@ public class MainWindow extends UiPart<Region> {
 
     @FXML
     private StackPane personListPanelPlaceholder;
+
+    @FXML
+    private StackPane eventsListPanelPlaceholder;
 
     @FXML
     private StackPane resultDisplayPlaceholder;
@@ -150,6 +156,9 @@ public class MainWindow extends UiPart<Region> {
 
         personListPanel = new PersonListPanel(logic.getFilteredPersonList());
         personListPanelPlaceholder.getChildren().add(personListPanel.getRoot());
+
+        eventsListPanel = new EventsListPanel(logic.getFilteredEventList());
+        eventsListPanelPlaceholder.getChildren().add(eventsListPanel.getRoot());
 
         ResultDisplay resultDisplay = new ResultDisplay();
         resultDisplayPlaceholder.getChildren().add(resultDisplay.getRoot());
@@ -264,6 +273,10 @@ public class MainWindow extends UiPart<Region> {
         return this.personListPanel;
     }
 
+    public EventsListPanel getEventsListPanel() {
+        return this.eventsListPanel;
+    }
+
     void releaseResources() {
         browserPanel.freeResources();
     }
@@ -286,5 +299,17 @@ public class MainWindow extends UiPart<Region> {
         logger.info(LogsCenter.getEventHandlingLogMessage(event));
         handleChangeTheme(event.theme);
         logic.setCurrentTheme(getCurrentTheme());
+    }
+    @Subscribe
+    private void handlePanelSwitchEvent(PanelSwitchRequestEvent event) {
+        logger.info(LogsCenter.getEventHandlingLogMessage(event));
+        if (event.wantedPanel.toString().equals(EventsCommand.COMMAND_WORD)){
+            personListPanelPlaceholder.getChildren().remove(personListPanel.getRoot());
+            eventsListPanelPlaceholder.getChildren().add(eventsListPanel.getRoot());
+        }
+        else {
+            eventsListPanelPlaceholder.getChildren().remove(eventsListPanel.getRoot());
+            personListPanelPlaceholder.getChildren().add(personListPanel.getRoot());
+        }
     }
 }

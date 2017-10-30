@@ -1,5 +1,7 @@
 package seedu.address.logic.commands;
 
+import seedu.address.commons.core.EventsCenter;
+import seedu.address.commons.events.ui.PanelSwitchRequestEvent;
 import seedu.address.model.event.*;
 
 public class EventsCommand extends Command {
@@ -16,6 +18,7 @@ public class EventsCommand extends Command {
     @Override
     public CommandResult execute() {
         model.updateFilteredEventList(predicate);
+        EventsCenter.getInstance().post(new PanelSwitchRequestEvent(COMMAND_WORD));
         return new CommandResult(getEventsMessageSummary(model.getFilteredEventList().size()));
     }
 
