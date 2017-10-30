@@ -14,6 +14,7 @@ import seedu.address.logic.commands.ClearCommand;
 import seedu.address.logic.commands.Command;
 import seedu.address.logic.commands.DeleteCommand;
 import seedu.address.logic.commands.EditCommand;
+import seedu.address.logic.commands.EventsCommand;
 import seedu.address.logic.commands.ExitCommand;
 import seedu.address.logic.commands.FavouriteCommand;
 import seedu.address.logic.commands.FavouriteListCommand;
@@ -126,6 +127,8 @@ public class AddressBookParser {
         case BirthdaysCommand.COMMAND_WORD: case BirthdaysCommand.COMMAND_ALIAS:
             return new BirthdaysCommand();
 
+            case EventsCommand.COMMAND_WORD: case EventsCommand.COMMAND_ALIAS:
+                return new EventsCommand();
         default:
             throw new ParseException(MESSAGE_UNKNOWN_COMMAND);
         }
