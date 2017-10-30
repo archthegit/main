@@ -130,7 +130,8 @@ public class AddressBookParser {
             return new BirthdaysCommand();
 
         case EventsCommand.COMMAND_WORD: case EventsCommand.COMMAND_ALIAS:
-                return new EventsCommand();
+            return new EventsCommand();
+
         default:
             throw new ParseException(MESSAGE_UNKNOWN_COMMAND);
         }

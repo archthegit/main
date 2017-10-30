@@ -17,6 +17,12 @@ public class EventPredicate implements Predicate<ReadOnlyEvent> {
     public EventPredicate() {
     }
 
+    /**
+     * Checks if event falls in the month
+     * @param event
+     * @return
+     * @throws ParseException
+     */
     public boolean checkIfEventFallsInMonth(ReadOnlyEvent event) throws ParseException {
         Date date = new SimpleDateFormat("dd/MM/yyyy").parse(event.getDate().toString());
         Calendar cal = Calendar.getInstance();
