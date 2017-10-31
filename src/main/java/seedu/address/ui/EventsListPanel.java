@@ -69,7 +69,7 @@ public class EventsListPanel extends UiPart<Region> {
     }
 
     /**
-    * Custom {@code ListCell} that displays the graphics of a {@code PersonCard}.
+    * Custom {@code ListCell} that displays the graphics of a {@code EventsCard}.
     */
     class EventListViewCell extends ListCell<EventsCard> {
 
