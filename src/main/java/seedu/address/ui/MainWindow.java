@@ -308,9 +308,6 @@ public class MainWindow extends UiPart<Region> {
         if (event.wantedPanel.toString().equals(EventsCommand.COMMAND_WORD)) {
             personListPanelPlaceholder.getChildren().remove(personListPanel.getRoot());
             eventsListPanelPlaceholder.getChildren().add(eventsListPanel.getRoot());
-        } else {
-            eventsListPanelPlaceholder.getChildren().remove(eventsListPanel.getRoot());
-            personListPanelPlaceholder.getChildren().add(personListPanel.getRoot());
         }
     }
 }
