@@ -309,5 +309,9 @@ public class MainWindow extends UiPart<Region> {
             personListPanelPlaceholder.getChildren().remove(personListPanel.getRoot());
             eventsListPanelPlaceholder.getChildren().add(eventsListPanel.getRoot());
         }
+        else{
+            personListPanelPlaceholder.getChildren().add(personListPanel.getRoot());
+            eventsListPanelPlaceholder.getChildren().remove(eventsListPanel.getRoot());
+        }
     }
 }
