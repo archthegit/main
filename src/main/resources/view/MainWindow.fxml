@@ -38,14 +38,17 @@
   <SplitPane id="splitPane" fx:id="splitPane" dividerPositions="0.3, 0.5" VBox.vgrow="ALWAYS">
     <VBox fx:id="personList" minWidth="270" prefWidth="340" SplitPane.resizableWithParent="false">
         <StackPane VBox.vgrow="ALWAYS">
-            <padding>
-                <Insets bottom="10" left="10" right="10" top="10" />
-            </padding>
             <children>
-                <StackPane fx:id="eventsListPanelPlaceholder"  />
-            </children>
-            <children>
-                <StackPane fx:id="personListPanelPlaceholder"  />
+                <StackPane fx:id="eventsListPanelPlaceholder"  VBox.vgrow="ALWAYS">
+                    <padding>
+                        <Insets bottom="10" left="10" right="10" top="10" />
+                </padding>
+                </StackPane>
+                <StackPane fx:id="personListPanelPlaceholder"  VBox.vgrow="ALWAYS">
+                    <padding>
+                        <Insets bottom="10" left="10" right="10" top="10" />
+                    </padding>
+                </StackPane>
             </children>
         </StackPane>
     </VBox>
