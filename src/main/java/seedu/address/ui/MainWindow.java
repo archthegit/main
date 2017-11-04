@@ -306,12 +306,12 @@ public class MainWindow extends UiPart<Region> {
     private void handlePanelSwitchEvent(PanelSwitchRequestEvent event) {
         logger.info(LogsCenter.getEventHandlingLogMessage(event));
         if (event.wantedPanel.toString().equals(EventsCommand.COMMAND_WORD)) {
-            personListPanelPlaceholder.getChildren().remove(personListPanel.getRoot());
+            personListPanelPlaceholder.getChildren().clear();
             eventsListPanelPlaceholder.getChildren().add(eventsListPanel.getRoot());
         }
         else{
             personListPanelPlaceholder.getChildren().add(personListPanel.getRoot());
-            eventsListPanelPlaceholder.getChildren().remove(eventsListPanel.getRoot());
+            eventsListPanelPlaceholder.getChildren().clear();
         }
     }
 }
