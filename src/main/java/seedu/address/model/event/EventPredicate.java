@@ -6,6 +6,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.function.Predicate;
 
+//@@author archthegit
+
 /**
  * Predicate class checks if a given event falls within the month
  */

@@ -7,6 +7,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import seedu.address.model.event.ReadOnlyEvent;
 
+//@@author archthegit
+
 /**
  * Event card ui to hold event name, date and address
  */

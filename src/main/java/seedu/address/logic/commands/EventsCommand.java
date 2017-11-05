@@ -4,6 +4,8 @@ import seedu.address.commons.core.EventsCenter;
 import seedu.address.commons.events.ui.PanelSwitchRequestEvent;
 import seedu.address.model.event.EventPredicate;
 
+//@@author archthegit
+
 /**
  * Command to list events for the month
  */
