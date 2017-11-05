@@ -25,6 +25,7 @@ public class SelectCommand extends Command {
             + "Example: " + COMMAND_WORD + " 1";
 
     public static final String MESSAGE_SELECT_PERSON_SUCCESS = "Selected Person: %2$s at Index %1$s";
+    public static final String FACEBOOK_URL_PREFIX = "https://www.facebook.com/";
 
     private final Index targetIndex;
 
@@ -36,16 +37,19 @@ public class SelectCommand extends Command {
     public CommandResult execute() throws CommandException {
 
         List<ReadOnlyPerson> lastShownList = model.getFilteredPersonList();
+
         ReadOnlyPerson person = lastShownList.get(targetIndex.getZeroBased());
         String name = person.getName().toString();
+        String website = person.getWebsite().toString();
 
-        if (targetIndex.getZeroBased() >= lastShownList.size()) {
-            throw new CommandException(Messages.MESSAGE_INVALID_DISPLAYED_INDEX);
+        if (website.equals("NIL")) {
+            website = FACEBOOK_URL_PREFIX;
         }
 
         EventsCenter.getInstance().post(new AccessWebsiteRequestEvent(person.getWebsite().toString()));
         EventsCenter.getInstance().post(new JumpToListRequestEvent(targetIndex));
         EventsCenter.getInstance().post(new PanelSwitchRequestEvent(COMMAND_WORD));
+
         return new CommandResult(String.format(MESSAGE_SELECT_PERSON_SUCCESS, targetIndex.getOneBased(), name));
     }
 

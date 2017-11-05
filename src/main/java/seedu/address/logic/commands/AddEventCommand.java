@@ -25,7 +25,9 @@ public class AddEventCommand extends UndoableCommand {
             + PREFIX_ADDRESS + "ADDRESS "
             + "Example: " + COMMAND_WORD + " "
             + PREFIX_NAME + "ZoukOut "
+
             + PREFIX_DATE + "05/11/2017"
+
             + PREFIX_ADDRESS + "Sentosa Beach, Siloso";
 
     public static final String MESSAGE_SUCCESS = "New event added: %1$s";
